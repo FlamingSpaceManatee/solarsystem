@@ -10,7 +10,7 @@ public class Window extends JFrame{
 
 	public Window(boolean windowed){
 
-		super("window");
+		super("CS30_Final");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		screen = new Screen();
@@ -19,8 +19,8 @@ public class Window extends JFrame{
 		if (windowed){
 
 			this.setVisible(true);													//Make Window visible
-			//this.setLocationRelativeTo(null);										//Centre Window
-			this.setExtendedState(JFrame.MAXIMIZED_BOTH);	//Maximizes window to screen
+			this.setLocationRelativeTo(null);										//Centre Window
+			this.setExtendedState(JFrame.MAXIMIZED_BOTH);							//Maximizes window to screen
 			this.setResizable(false);												//Lock Window size
 			screen.setPreferredSize(this.getContentPane().getSize());				//Set Canvas size to size inside window
 

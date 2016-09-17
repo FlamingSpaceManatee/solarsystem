@@ -7,11 +7,11 @@ import java.awt.Color;
 public class Program{
 	
 	public static boolean HEADLESS = false;
-	public static double TIME_SCALE = 1d;
+	public static double TICK_SCALE = 1d;
 	public static boolean WINDOWED = false;
 
 	private static long TICK_COUNT;
-	private static long FRAME_COUNT = 60;
+	private static long FRAME_COUNT;
 	private static double SECOND_COUNT = 1.0;
 
 
@@ -35,7 +35,7 @@ public class Program{
 
 			if (s.matches("-t\\d*.\\d*")){
 
-				TIME_SCALE = Double.parseDouble(s.substring(2, s.length()));
+				TICK_SCALE = Double.parseDouble(s.substring(2, s.length()));
 
 			}
 
@@ -75,11 +75,16 @@ public class Program{
 	private void mainLoop(){
 
 		final double D_FPS = 60.0;
-		final double D_INTERVAL = 1000000000.0 / D_FPS;
-		int frames = 0;
+		final double D_UPS = 60.0 * TICK_SCALE;
+		final double D_F_INTERVAL = 1000000000.0 / D_FPS;
+		final double D_T_INTERVAL = 1000000000.0 / D_UPS;
+
+		TICK_COUNT = (long) D_UPS;
+		FRAME_COUNT = (long) D_FPS;
 
 		long time = System.nanoTime();
-		long lastTime = time;
+		long lastUpdateTime = time;
+		long lastRenderTime = time;
 
 		boolean running = true;
 
@@ -87,35 +92,28 @@ public class Program{
 
 			//ProcessInputs
 
-			if (!HEADLESS){
+			if (!HEADLESS && (time - lastRenderTime) >= (D_F_INTERVAL - 1750000)) {
 
 				render();
+				lastRenderTime = time;
 
 			}
 			
 			update();
-			frames++;
 
-			lastTime = time;
 			time = System.nanoTime();
-
-			if (SECOND_COUNT >= 2.0){
-
-				FRAME_COUNT = 60;
-				SECOND_COUNT = 1.0;
-
-			}
+			lastUpdateTime = time;
 
 			/*
-				While the time it took to update is less than 1/60 of a second,
+				While the time it took to update is less than desired interval,
 				try to sleep for the difference until the time between updates
 				is greater or equal to 1/60 of a second.
 			*/
-			while (time - lastTime <= (D_INTERVAL - 1750000)){
+			while (time - lastUpdateTime < (D_T_INTERVAL - 1250000)){
 
 				try {
 
-					Thread.sleep((long)((D_INTERVAL - (time - lastTime)) / 1000000.0));
+					Thread.sleep((long)((D_T_INTERVAL - (time - lastUpdateTime)) / 1000000.0));
 
 				} catch (InterruptedException e){}
 
@@ -123,13 +121,13 @@ public class Program{
 
 			}
 
-			SECOND_COUNT += (time - lastTime) / 1000000000.0;
+			SECOND_COUNT += (time - Math.max(lastRenderTime, lastUpdateTime)) / 1000000000.0;
 		}
 	}
 
 	private void render(){
 
-		Graphics2D g = screen.getGraphics();	//Get Graphics2D object of screen
+		Graphics2D g = screen.getBufferGraphics();	//Get Graphics2D object of screen
 		Dimension d = screen.getSize();			//Get Dimension of screen
 
 		g.setColor(new Color(0, 0, 0));			//Set Graphics color to black
@@ -144,6 +142,7 @@ public class Program{
 			s = s.substring(0, 17);
 			s += ", FPS: " + (FRAME_COUNT / SECOND_COUNT);
 			s = s.substring(0, 30);
+			s += ", UPS: " + (TICK_COUNT / SECOND_COUNT);
 			g.drawString(s, 100, 100);
 
 		} catch (Exception e){
@@ -151,10 +150,11 @@ public class Program{
 			String s = "Elapsed Time: " + SECOND_COUNT + ", FPS: " + (FRAME_COUNT / SECOND_COUNT);
 			g.drawString("ERR: " + s.length(), 100, 100);
 
-		}		//JUST FOR TESTING~~~~~~~~~~~~~
+		}
+		//JUST FOR TESTING~~~~~~~~~~~~~
 
 
-		//DO other rendering here
+		//Do other rendering here
 
 		screen.flipBuffer();					//Flip the current screen with g
 		g.dispose();							//Dispose of g since it isn't needed anymore

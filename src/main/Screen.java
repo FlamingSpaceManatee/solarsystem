@@ -10,18 +10,18 @@ public class Screen extends Canvas{
 
 	public Screen(){
 
-
-
 	}
 
 	public void createBuffer(){
 
-		this.createBufferStrategy(2);
-		this.buffer = this.getBufferStrategy();
+		while (this.buffer == null){
 
+			this.createBufferStrategy(2);
+			this.buffer = this.getBufferStrategy();
+		}
 	}
 
-	public Graphics2D getGraphics(){
+	public Graphics2D getBufferGraphics(){
 
 		return ((Graphics2D)buffer.getDrawGraphics());
 
