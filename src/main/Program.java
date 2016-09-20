@@ -3,6 +3,9 @@ package main;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 public class Program{
 	
@@ -14,8 +17,19 @@ public class Program{
 	private static long FRAME_COUNT;
 	private static double SECOND_COUNT = 1.0;
 
-
+	private InputListener input;
 	private Screen screen;
+
+	InterfaceElement xxx = new InterfaceElement(300, 300, 256, 64){
+
+		@Override
+		protected void mouseClickAction(){
+
+			System.out.println("fiuck");
+
+		}
+
+	};
 
 	public static void main(String[] args){
 
@@ -46,10 +60,16 @@ public class Program{
 			}
 		}
 
+		input = new InputListener();
+
 		if (!HEADLESS){
 
 			Window w = new Window(WINDOWED);
 			screen = w.getScreen();
+
+			screen.addKeyListener(input);
+			screen.addMouseListener(input);
+			screen.addMouseMotionListener(input);
 
 			if (screen == null){
 
@@ -90,7 +110,11 @@ public class Program{
 
 		while (running){
 
-			//ProcessInputs
+			while(input.hasEvents()){
+
+				handleEvent(input.nextEvent());
+
+			}
 
 			if (!HEADLESS && (time - lastRenderTime) >= (D_F_INTERVAL - 1750000)) {
 
@@ -153,6 +177,7 @@ public class Program{
 		}
 		//JUST FOR TESTING~~~~~~~~~~~~~
 
+		xxx.draw(g);
 
 		//Do other rendering here
 
@@ -167,5 +192,19 @@ public class Program{
 
 		TICK_COUNT++;							//Increment total tick count by 1
 
+	}
+
+	private void handleEvent(InputEvent e){
+
+		if (e instanceof KeyEvent){
+
+			if (((KeyEvent)e).getKeyCode() == KeyEvent.VK_ESCAPE)
+				System.exit(0);
+
+		}
+
+		if (e instanceof MouseEvent)
+			xxx.handleMouseEvent((MouseEvent)e);
+		
 	}
 }
