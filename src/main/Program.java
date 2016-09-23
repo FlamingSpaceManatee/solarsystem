@@ -11,6 +11,7 @@ import java.awt.Polygon;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 import ui.*;
 
@@ -25,6 +26,7 @@ public class Program{
 	private static double SECOND_COUNT = 1.0;
 
 	private Screen screen;
+	private UIElement el;
 
 	public static void main(String[] args){
 
@@ -33,6 +35,9 @@ public class Program{
 	}
 
 	public Program(String[] args){
+
+		el = new UIElement(100, 100, 100, 100);
+		el.setOnClick(q -> System.out.println("fcuk"));
 
 		for (String s : args){
 
@@ -158,7 +163,7 @@ public class Program{
 
 		g.setColor(new Color(1.0f, 1.0f, 1.0f));
 
-
+		el.draw(g);
 		//Do other rendering here
 
 		screen.flipBuffer();																							//Flip the current screen with g
@@ -193,6 +198,7 @@ public class Program{
 
 			MouseEvent e = (MouseEvent)x;
 			MouseEventType t = (MouseEventType)InputListener.getType(x);
+			el.handleMouseEvent(e, t);
 
 		}
 
