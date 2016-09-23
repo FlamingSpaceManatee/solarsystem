@@ -6,6 +6,13 @@ import java.awt.Color;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.RenderingHints;
+import java.awt.Polygon;
+
+import java.util.Map;
+import java.util.HashMap;
+
+import ui.*;
 
 public class Program{
 	
@@ -17,19 +24,7 @@ public class Program{
 	private static long FRAME_COUNT;
 	private static double SECOND_COUNT = 1.0;
 
-	private InputListener input;
 	private Screen screen;
-
-	InterfaceElement xxx = new InterfaceElement(300, 300, 256, 64){
-
-		@Override
-		protected void mouseClickAction(){
-
-			System.out.println("fiuck");
-
-		}
-
-	};
 
 	public static void main(String[] args){
 
@@ -60,16 +55,14 @@ public class Program{
 			}
 		}
 
-		input = new InputListener();
-
 		if (!HEADLESS){
 
 			Window w = new Window(WINDOWED);
 			screen = w.getScreen();
 
-			screen.addKeyListener(input);
-			screen.addMouseListener(input);
-			screen.addMouseMotionListener(input);
+			screen.addKeyListener(InputListener.getInstance());
+			screen.addMouseListener(InputListener.getInstance());
+			screen.addMouseMotionListener(InputListener.getInstance());
 
 			if (screen == null){
 
@@ -110,9 +103,9 @@ public class Program{
 
 		while (running){
 
-			while(input.hasEvents()){
+			while(InputListener.hasEvents()){
 
-				handleEvent(input.nextEvent());
+				handleEvent(InputListener.nextEvent());
 
 			}
 
@@ -151,60 +144,57 @@ public class Program{
 
 	private void render(){
 
-		Graphics2D g = screen.getBufferGraphics();	//Get Graphics2D object of screen
-		Dimension d = screen.getSize();			//Get Dimension of screen
+		Graphics2D g = screen.getBufferGraphics();																		//Get Graphics2D object of screen
+		Dimension d = screen.getSize();																					//Get Dimension of screen
 
-		g.setColor(new Color(0, 0, 0));			//Set Graphics color to black
-		g.fillRect(0, 0, d.width, d.height);	//Clear screen with black
-		g.setColor(new Color(1.0f, 1.0f, 0.0f));
+		g.setColor(new Color(0, 0, 0));																					//Set Graphics color to black
+		g.fillRect(0, 0, d.width, d.height);																			//Clear screen with black
 
+		Map<Object, Object> hints = new HashMap<Object, Object>();
+		hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
 
-		//JUST FOR TESTING~~~~~~~~~~~~~
-		try {
-		
-			String s = "Elapsed Time: " + SECOND_COUNT;
-			s = s.substring(0, 17);
-			s += ", FPS: " + (FRAME_COUNT / SECOND_COUNT);
-			s = s.substring(0, 30);
-			s += ", UPS: " + (TICK_COUNT / SECOND_COUNT);
-			g.drawString(s, 100, 100);
+		g.setRenderingHints(hints);
 
-		} catch (Exception e){
+		g.setColor(new Color(1.0f, 1.0f, 1.0f));
 
-			String s = "Elapsed Time: " + SECOND_COUNT + ", FPS: " + (FRAME_COUNT / SECOND_COUNT);
-			g.drawString("ERR: " + s.length(), 100, 100);
-
-		}
-		//JUST FOR TESTING~~~~~~~~~~~~~
-
-		xxx.draw(g);
 
 		//Do other rendering here
 
-		screen.flipBuffer();					//Flip the current screen with g
-		g.dispose();							//Dispose of g since it isn't needed anymore
+		screen.flipBuffer();																							//Flip the current screen with g
+		g.dispose();																									//Dispose of g since it isn't needed anymore
 
-		FRAME_COUNT++;							//Increment total frame count by 1
+		FRAME_COUNT++;																									//Increment total frame count by 1
 
 	}
 
 	private void update(){
 
-		TICK_COUNT++;							//Increment total tick count by 1
+		TICK_COUNT++;																									//Increment total tick count by 1
 
 	}
 
-	private void handleEvent(InputEvent e){
+	private void handleEvent(InputEvent x){
 
-		if (e instanceof KeyEvent){
+		if (x instanceof KeyEvent){
 
-			if (((KeyEvent)e).getKeyCode() == KeyEvent.VK_ESCAPE)
+			KeyEvent e = (KeyEvent)x;
+			KeyEventType t = (KeyEventType)InputListener.getType(x);
+
+			if (e.getKeyCode() == KeyEvent.VK_ESCAPE &&
+				t == KeyEventType.KEY_RELEASED)
 				System.exit(0);
+
+			//HANDLE KEY EVENTS
 
 		}
 
-		if (e instanceof MouseEvent)
-			xxx.handleMouseEvent((MouseEvent)e);
-		
+		if (x instanceof MouseEvent){
+
+			MouseEvent e = (MouseEvent)x;
+			MouseEventType t = (MouseEventType)InputListener.getType(x);
+
+		}
+
 	}
 }

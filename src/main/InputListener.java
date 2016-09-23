@@ -9,31 +9,47 @@ import java.awt.event.KeyListener;
 import javax.swing.event.MouseInputAdapter;
 
 import java.awt.Point;
-import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 public class InputListener extends MouseInputAdapter implements KeyListener{
 	
-	private ArrayList<InputEvent> events;
+	private static Hashtable<InputEvent, Object> events;
+	private static InputListener instance = new InputListener();
 
-	public InputListener(){
+	public static InputListener getInstance(){
 
-		this.events = new ArrayList<InputEvent>();
+		return instance;
 
 	}
 
-	public InputEvent nextEvent(){
+	private InputListener(){
 
-		if (events.size() == 0)
+		this.events = new Hashtable<InputEvent, Object>();
+
+	}
+
+	public static InputEvent nextEvent(){
+
+		if (!hasEvents())
 			return null;
 
-		InputEvent e = events.get(0);
-		events.remove(0);
+		return events.keySet().iterator().next();
+	}
 
-		return e;
+	public static Object getType(InputEvent e){
+
+		if (!hasEvents())
+			return null;
+
+		Object o = events.get(e);
+		events.remove(e);
+		
+		return o;
 
 	}
 
-	public boolean hasEvents(){
+	public static boolean hasEvents(){
 
 		return events.size() > 0;
 
@@ -42,55 +58,55 @@ public class InputListener extends MouseInputAdapter implements KeyListener{
 	@Override
 	public void mouseClicked(MouseEvent e){
 
-		events.add(e);
+		events.put(e, MouseEventType.MOUSE_CLICKED);
 
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e){
 
-		events.add(e);
+		events.put(e, MouseEventType.MOUSE_DRAGGED);
 
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e){
 
-		events.add(e);
+		events.put(e, MouseEventType.MOUSE_MOVED);
 
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e){
 	
-		events.add(e);
+		events.put(e, MouseEventType.MOUSE_PRESSED);
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e){
 
-		events.add(e);
+		events.put(e, MouseEventType.MOUSE_RELEASED);
 
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e){
 
-		events.add(e);
+		events.put(e, KeyEventType.KEY_RELEASED);
 
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e){
 
-		events.add(e);
+		events.put(e, KeyEventType.KEY_PRESSED);
 
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e){
 
-		events.add(e);
+		events.put(e, KeyEventType.KEY_TYPED);
 
 	}
 }
