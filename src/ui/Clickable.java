@@ -11,6 +11,6 @@ public interface Clickable {
 	public void handleMouseDrag(MouseEvent e);
 	public void handleMouseEvent(MouseEvent e, MouseEventType t);
 
-	public void setOnClick(Consumer<Clickable> c);
+	public void setOnClick(Consumer<Object> c);
 
 }

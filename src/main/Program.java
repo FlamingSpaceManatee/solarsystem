@@ -26,7 +26,9 @@ public class Program{
 	private static double SECOND_COUNT = 1.0;
 
 	private Screen screen;
-	private UIElement el;
+	private Button b;
+	private Button b2;
+	private Button b3;
 
 	public static void main(String[] args){
 
@@ -36,8 +38,12 @@ public class Program{
 
 	public Program(String[] args){
 
-		el = new UIElement(100, 100, 100, 100);
-		el.setOnClick(q -> System.out.println("fcuk"));
+		b = new Button(100, 100, 200, 50, "button.png");
+		b.setOnClick(xyz -> System.out.println("Button"));
+		b2 = new Button(700, 100, 200, 50, "button.png");
+		b2.setOnClick(xyz -> System.out.println("Button2"));
+		b3 = new Button(400, 100, 200, 50, "button.png");
+		b3.setOnClick(xyz -> System.out.println("Button3"));
 
 		for (String s : args){
 
@@ -163,7 +169,9 @@ public class Program{
 
 		g.setColor(new Color(1.0f, 1.0f, 1.0f));
 
-		el.draw(g);
+		b.draw(g);
+		b2.draw(g);
+		b3.draw(g);
 		//Do other rendering here
 
 		screen.flipBuffer();																							//Flip the current screen with g
@@ -198,7 +206,9 @@ public class Program{
 
 			MouseEvent e = (MouseEvent)x;
 			MouseEventType t = (MouseEventType)InputListener.getType(x);
-			el.handleMouseEvent(e, t);
+			b.handleMouseEvent(e, t);
+			b2.handleMouseEvent(e, t);
+			b3.handleMouseEvent(e, t);
 
 		}
 
