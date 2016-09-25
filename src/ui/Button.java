@@ -2,23 +2,27 @@ package ui;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import graphics.SpriteSheet;
 import graphics.ResourceManager;
 
 public class Button extends UIElement {
 	
-	private BufferedImage image;
+	private SpriteSheet image;
 
 	public Button(int x, int y, int w, int h, String imageName){
 
 		super(x, y, w, h);
-		image = ResourceManager.getImage(imageName);
+		image = new SpriteSheet(imageName, w, h);
 
 	}
 
 	@Override
 	public void draw(Graphics2D g){
 
-		g.drawImage(image, bounds.x, bounds.y, null);
+		if (clicked)
+			g.drawImage(image.getImage(0), bounds.x, bounds.y, null);
+		else
+			g.drawImage(image.getImage(1), bounds.x, bounds.y, null);
 
 	}
 }

@@ -40,9 +40,9 @@ public class Program{
 
 		b = new Button(100, 100, 200, 50, "button.png");
 		b.setOnClick(xyz -> System.out.println("Button"));
-		b2 = new Button(700, 100, 200, 50, "button.png");
+		b2 = new Button(700, 100, 200, 50, "button2.png");
 		b2.setOnClick(xyz -> System.out.println("Button2"));
-		b3 = new Button(400, 100, 200, 50, "button.png");
+		b3 = new Button(400, 100, 100, 25, "button.png");
 		b3.setOnClick(xyz -> System.out.println("Button3"));
 
 		for (String s : args){

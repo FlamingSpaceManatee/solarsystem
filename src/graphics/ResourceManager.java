@@ -13,13 +13,13 @@ import javax.imageio.ImageIO;
 
 public class ResourceManager {
 	
-	private static GraphicsConfiguration config = 
+	public static GraphicsConfiguration CONFIG = 
 		GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		
 
 	private static Hashtable<String, ImageContainer> images = new Hashtable<String, ImageContainer>();
 
-	//Loads image file from filename
+	//Loads image file from file name
 	public static void loadImage(String fileName){
 
 		if (images.containsKey(fileName))
@@ -56,55 +56,21 @@ public class ResourceManager {
 
 	}
 
-	//A class to hold all scaled versions of an image
-	private static class ImageContainer {
+	protected static ImageContainer getImageContainer(String fileName){
 
-		private Hashtable<Dimension, BufferedImage> sizes;
-		private final Dimension originalSize;
+		if (!images.containsKey(fileName))
+			loadImage(fileName);
 
-		protected ImageContainer(BufferedImage image){
-
-			originalSize = new Dimension(image.getWidth(), image.getHeight());
-			sizes = new Hashtable<Dimension, BufferedImage>();
-			sizes.put(originalSize, image);
-
-		}
-
-		//returns source image
-		protected BufferedImage getImage(){
-
-			return sizes.get(originalSize);
-
-		}
-
-		//Returns scaled image of source image
-		protected BufferedImage getImage(float scale){
-
-			//Find scaled dimensions
-			Dimension s = new Dimension((int)(originalSize.width * scale), (int)(originalSize.height * scale));
-
-			//If the scale is 1 or a scaled image was already generated it return that
-			if (sizes.containsKey(s) || s.equals(originalSize))
-				return sizes.get(s);
-
-			BufferedImage source = sizes.get(originalSize);												//Create Pointer to source image
-			BufferedImage b = config.createCompatibleImage(s.width, s.height, source.getTransparency());//Create new image with same dimensions
-			AffineTransform t = AffineTransform.getScaleInstance(scale, scale);							//Creates AffineTransform to scale
-
-			((Graphics2D)b.getGraphics()).drawRenderedImage(source, t);
-			sizes.put(s, b);
-
-			return b;
-		}
+		return images.get(fileName);
 	}
 
 	//Optimise BufferedImage for screen capabilities
 	private static BufferedImage makeCompatible(BufferedImage b){
 
-		if (b.getColorModel().equals(config.getColorModel()))
+		if (b.getColorModel().equals(CONFIG.getColorModel()))
 			return b;
 
-		BufferedImage b2 = config.createCompatibleImage(b.getWidth(), b.getHeight(), b.getTransparency());
+		BufferedImage b2 = CONFIG.createCompatibleImage(b.getWidth(), b.getHeight(), b.getTransparency());
 		((Graphics2D)b2.getGraphics()).drawImage(b, 0, 0, null);
 
 		return b2;
