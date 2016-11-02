@@ -1,6 +1,7 @@
 package ui;
 
-import main.MouseEventType;
+import component.MouseEventType;
+import component.ClickComponent;
 
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -9,16 +10,19 @@ import java.awt.Point;
 import java.awt.Graphics2D;
 import java.util.function.Consumer;
 
-public abstract class UIElement implements Clickable {
+public abstract class UIElement implements ClickComponent {
 	
 	protected Rectangle bounds;
 	protected Consumer<Object> onClick;
+	protected UIElement clickElement;
 
 	protected boolean clicked;
 	protected boolean draggable;
 	protected boolean dragged;
 
-	private Point clickedPoint;
+	protected boolean delete;
+
+	protected Point clickedPoint;
 
 	public UIElement(int x, int y, int w, int h){
 
@@ -28,6 +32,10 @@ public abstract class UIElement implements Clickable {
 		clicked = false;
 		draggable = false;
 		dragged = false;
+
+		delete = false;
+
+		clickElement = this;
 
 	}
 
@@ -39,6 +47,10 @@ public abstract class UIElement implements Clickable {
 		clicked = false;
 		this.draggable = draggable;
 		dragged = false;
+
+		delete = false;
+
+		clickElement = this;
 
 	}
 
@@ -56,28 +68,24 @@ public abstract class UIElement implements Clickable {
 		dragged = false;
 
 		if (onClick != null)
-			onClick.accept(this);
+			onClick.accept(clickElement);
 
 	}
 
 	public void handleMouseDrag(MouseEvent e){
 
-		if (draggable) {
-
-			dragged = true;
-			bounds.translate(e.getPoint().x - clickedPoint.x, e.getPoint().y - clickedPoint.y);
-			clickedPoint = e.getPoint();
-
-		}
+		dragged = true;
+		translate(e.getPoint().x - clickedPoint.x, e.getPoint().y - clickedPoint.y);
+		clickedPoint = e.getPoint();
 
 	}
 
-	public void handleMouseEvent(MouseEvent e, MouseEventType t){
+	public boolean handleMouseEvent(MouseEvent e, MouseEventType t){
 
 		if (!inside(e.getPoint()) && !dragged) {
 
 			clicked = false;
-			return;
+			return false;
 
 		}
 
@@ -94,22 +102,49 @@ public abstract class UIElement implements Clickable {
 				break;
 
 			case MOUSE_DRAGGED:
-				if (clicked)
+				if (clicked && draggable)
 					handleMouseDrag(e);
 				break;
 		}
 
+		return true;
 	}
 
-	public void setOnClick(Consumer<Object> c){
+	@Override
+	public void setReleasedEvent(Consumer<Object> c){
 
 		this.onClick = c;
+
+	}
+
+	@Override
+	public void setPressedEvent(Consumer<Object> c){
+
+
 
 	}
 
 	public boolean inside(Point p){
 
 		return bounds.contains(p);
+
+	}
+
+	public void translate(int dx, int dy){
+
+		bounds.translate(dx, dy);
+
+	}
+
+	public boolean isDeleted(){
+
+		return delete;
+
+	}
+
+	public void setEventElement(UIElement e){
+
+		clickElement = e;
 
 	}
 

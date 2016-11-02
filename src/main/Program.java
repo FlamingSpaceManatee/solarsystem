@@ -13,7 +13,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+import component.MouseEventType;
+import component.KeyEventType;
 import ui.*;
+import graphics.*;
+import game.Main;
 
 public class Program{
 	
@@ -26,9 +30,8 @@ public class Program{
 	private static double SECOND_COUNT = 1.0;
 
 	private Screen screen;
-	private Button b;
-	private Button b2;
-	private Button b3;
+
+	private Main m;
 
 	public static void main(String[] args){
 
@@ -38,12 +41,7 @@ public class Program{
 
 	public Program(String[] args){
 
-		b = new Button(100, 100, 200, 50, "button.png");
-		b.setOnClick(xyz -> System.out.println("Button"));
-		b2 = new Button(700, 100, 200, 50, "button2.png");
-		b2.setOnClick(xyz -> System.out.println("Button2"));
-		b3 = new Button(400, 100, 100, 25, "button.png");
-		b3.setOnClick(xyz -> System.out.println("Button3"));
+		m = new Main();
 
 		for (String s : args){
 
@@ -127,7 +125,7 @@ public class Program{
 
 			}
 			
-			update();
+			update((time - lastUpdateTime) / 1000000000.0);
 
 			time = System.nanoTime();
 			lastUpdateTime = time;
@@ -169,10 +167,9 @@ public class Program{
 
 		g.setColor(new Color(1.0f, 1.0f, 1.0f));
 
-		b.draw(g);
-		b2.draw(g);
-		b3.draw(g);
+		//c.draw(g);
 		//Do other rendering here
+		m.draw(g);
 
 		screen.flipBuffer();																							//Flip the current screen with g
 		g.dispose();																									//Dispose of g since it isn't needed anymore
@@ -181,9 +178,10 @@ public class Program{
 
 	}
 
-	private void update(){
+	private void update(double time){
 
 		TICK_COUNT++;																									//Increment total tick count by 1
+		m.update(time);
 
 	}
 
@@ -199,6 +197,7 @@ public class Program{
 				System.exit(0);
 
 			//HANDLE KEY EVENTS
+			//c.handleKeyEvent(e, t);
 
 		}
 
@@ -206,9 +205,7 @@ public class Program{
 
 			MouseEvent e = (MouseEvent)x;
 			MouseEventType t = (MouseEventType)InputListener.getType(x);
-			b.handleMouseEvent(e, t);
-			b2.handleMouseEvent(e, t);
-			b3.handleMouseEvent(e, t);
+			//c.handleMouseEvent(e, t);
 
 		}
 

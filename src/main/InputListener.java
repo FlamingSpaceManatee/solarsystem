@@ -12,6 +12,9 @@ import java.awt.Point;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import component.KeyEventType;
+import component.MouseEventType;
+
 public class InputListener extends MouseInputAdapter implements KeyListener{
 	
 	private static Hashtable<InputEvent, Object> events;

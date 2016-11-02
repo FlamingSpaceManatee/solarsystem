@@ -56,7 +56,7 @@ public class ResourceManager {
 
 	}
 
-	protected static ImageContainer getImageContainer(String fileName){
+	public static ImageContainer getImageContainer(String fileName){
 
 		if (!images.containsKey(fileName))
 			loadImage(fileName);
