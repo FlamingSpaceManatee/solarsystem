@@ -161,7 +161,6 @@ public class Program{
 
 		Map<Object, Object> hints = new HashMap<Object, Object>();
 		hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		hints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
 
 		g.setRenderingHints(hints);
 
@@ -187,6 +186,8 @@ public class Program{
 
 	private void handleEvent(InputEvent x){
 
+		m.handleEvent(x);
+
 		if (x instanceof KeyEvent){
 
 			KeyEvent e = (KeyEvent)x;
@@ -208,6 +209,5 @@ public class Program{
 			//c.handleMouseEvent(e, t);
 
 		}
-
 	}
 }

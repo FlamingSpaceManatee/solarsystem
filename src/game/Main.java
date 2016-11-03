@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.Graphics2D;
+import java.awt.event.InputEvent;
 
 public class Main {
 	
@@ -24,4 +25,9 @@ public class Main {
 
 	}
 
+	public void handleEvent(InputEvent x){
+
+		s.handleEvent(x);
+
+	}
 }

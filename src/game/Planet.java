@@ -1,41 +1,37 @@
 package game;
 
 import component.*;
+import ui.*;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
-public class Planet implements DrawComponent, ClickComponent {
+public class Planet extends UIElement implements DrawComponent {
 	
 	private static final double G = 6.67e-11;
 	private static Point 		FOCUS;
 	private static double 		SCALE;
 	private static int 			centreX = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
 	private static int 			centreY = Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-	protected double x, y, m, r, x1, y1;
+	protected double x, y, m;
 	private double vX, vY;
 	private String name;
 	private float[] colour;
+	private boolean infoShown = false;
 
 	public Planet(double x, double y, double m, double v, double angle){
 
-		this.x = this.x1 = x;
-		this.y = this.y1 = y;
+		super((int)x, (int)y, 0, 0, true);
+
+		this.x = x;
+		this.y = y;
 		this.m = m;
-		this.vX =  v * Math.cos(angle);
-		this.vY = -v * Math.sin(angle);
-		this.r = 0;
+		this.vX =  v * Math.cos(Math.toRadians(angle));
+		this.vY = -v * Math.sin(Math.toRadians(angle));
 		this.colour = new float[]{1f, 1f, 1f};
-
-	}
-
-	public void setRadius(double r){
-
-		this.r = r;
 
 	}
 
@@ -51,35 +47,40 @@ public class Planet implements DrawComponent, ClickComponent {
 
 	}
 
+	public void setColour(float r ,float g, float b){
+
+		colour[0] = r;
+		colour[1] = g;
+		colour[2] = b;
+
+	}
+
 	public void update(double t, ArrayList<Planet> bodies){
 
-		x1 = x;
-		y1 = y;
-
-		if (bodies == null || t == 0)
+		if (bodies == null || t == 0 || dragged)
 			return;
 
 		for (Planet p : bodies){
 
 			if (this != p){
 
-				double rX = x - p.x1;
-				double rY = y - p.y1;
+				double rX = x - p.x;
+				double rY = y - p.y;
 
 				double rr = ((rX * rX) + (rY * rY));
-				double a = ((6.67e-11 * m * p.m) / (rr)) / m;
+				double a = (((G * m * p.m) / (rr)) / m);
 
-				double angle = (rX != 0) ? Math.atan(rY / rX) : 0;
+				double angle = Math.atan(rY / rX);
 				double aX = Math.abs(a * Math.cos(angle));
 				double aY = Math.abs(a * Math.sin(angle));
 
-				if (rX > 0)
+				if (rX >= 0)
 					aX = -aX;
-				if (rY > 0)
+				if (rY >= 0)
 					aY = -aY;
 
-				vX += aX * t;
-				vY += aY * t;
+				vX += (aX * t);
+				vY += (aY * t);
 
 
 			}
@@ -90,41 +91,44 @@ public class Planet implements DrawComponent, ClickComponent {
 
 	}
 
+	public void enableInfo(boolean show){
+
+		if (!show)
+			return;
+
+	}
+
+	@Override
+	public boolean inside(Point p){
+
+		double x0 = (x / SCALE) - (FOCUS.x / SCALE) + centreX;
+		double y0 = (y / SCALE) - (FOCUS.y / SCALE) + centreY;
+
+		return (p.x > (x0 - 5) && 
+				p.x < (x0 + 5) &&
+				p.y > (y0 - 5) &&
+				p.y < (y0 + 5));
+
+	}
+
+	@Override
+	public void translate(int dx, int dy){
+
+		x += dx * SCALE;
+		y += dy * SCALE;
+
+	}
+
 	@Override
 	public void draw(Graphics2D g){
 
 		double dX, dY;
 
-		dX = (x * SCALE) - (FOCUS.x * SCALE) + centreX;
-		dY = (y * SCALE) - (FOCUS.y * SCALE) + centreY;
+		dX = (x / SCALE) - (FOCUS.x / SCALE) + centreX;
+		dY = (y / SCALE) - (FOCUS.y / SCALE) + centreY;
 
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
-
-		if (r == 0)
-			g.fillOval((int)(dX - 1.5), (int)(dY- 1.5), 3, 3);
-		if (r > 0)
-			g.fillOval((int)(dX - (r / SCALE)), (int)(dY - (r / SCALE)), (int)(r / SCALE), (int)(r / SCALE));
-
-		System.out.println("Drawing planet @ " + dX + ", " + dY);
+		g.fillOval((int)(dX - 2), (int)(dY- 2), 4, 4);
 
 	}
-
-	@Override
-	public void handleMousePress(MouseEvent e){}
-
-	@Override
-	public void handleMouseRelease(MouseEvent e){}
-
-	@Override
-	public void handleMouseDrag(MouseEvent e){}
-
-	@Override
-	public boolean handleMouseEvent(MouseEvent e, MouseEventType t){ return true; }
-
-	@Override
-	public void setReleasedEvent(Consumer<Object> c){}
-
-	@Override
-	public void setPressedEvent(Consumer<Object> c){}
-
 }

@@ -1,37 +1,50 @@
 package game;
 
 import component.*;
+import main.InputListener;
 
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
-public class SolarSystem implements DrawComponent, ClickComponent {
+public class SolarSystem implements DrawComponent, KeyComponent {
 	
 	private ArrayList<Planet> bodies;
 	private double timeScale;
+	private boolean paused;
 	private Point focus;
 	private int focusI;
 
 	public SolarSystem(){
 
 		//Good Solar System scale : 5e11 ( 2 * Distance from Sun to Mars)
-		Planet.setScale(5e9);
-		timeScale = 1;
+		Planet.setScale(5e8);
+		timeScale = 864000;
 
 		bodies = new ArrayList<Planet>();
 		bodies.add(new Planet(0, 0, 1.989e30, 0, 0.0)); //Sun
+		getPlanet(0).setColour(1f, 1f, 0f);
+		bodies.add(new Planet(149.6e9, 0, 5.972e24, 29800, 90.0)); //Earth
+		getPlanet(1).setColour(0f, 0f, 1f);
+
 		bodies.add(new Planet(0, 57.91e9, 0.330e24, 47400, 0.0)); //Mercury
-		bodies.add(new Planet(-108.2e9, 0, 4.867e24, 35220, 0.0)); //Venus
-		bodies.add(new Planet(149.6e9, 0, 5.972e24, 29800, 0.0)); //Earth
-		//addPlanet(149.6e9 + 0.4055e9, 0, 0.07346e24, 30864, 90.0); //Moon
-		bodies.add(new Planet(0, -227.99e9, 6.42e23, 24060, 0.0)); //Mars
-		bodies.add(new Planet(778.6e9, 0, 1898e24, 13100, 0.0)); //Jupiter
-		bodies.add(new Planet(-1433.5e9, 0, 568e24, 9700, 0.0)); //Saturn
+		getPlanet(2).setColour(1f, 0f, 0f);
+		bodies.add(new Planet(-108.2e9, 0, 4.867e24, 35220, 270.0)); //Venus
+		getPlanet(3).setColour(0f, 1f, 0.5f);
+		bodies.add(new Planet(0, -227.99e9, 6.42e23, 24060, 180.0)); //Mars
+		getPlanet(4).setColour(1f, 0.25f, 0.1f);
+		bodies.add(new Planet(778.6e9, 0, 1898e24, 13100, 90.0)); //Jupiter
+		getPlanet(5).setColour(1f, 0.25f, 0f);
+		bodies.add(new Planet(-1433.5e9, 0, 568e24, 9700, 270.0)); //Saturn
+		getPlanet(6).setColour(0.75f, 0.25f, 0f);
 		bodies.add(new Planet(0, 2872.5e9, 86.8e24, 6800, 0.0)); //Uranus
-		bodies.add(new Planet(0, -4495.1e9, 102e24, 5400, 0.0)); //Neptune
+		getPlanet(7).setColour(0f, 0.25f, 1f);
+		bodies.add(new Planet(0, -4495.1e9, 102e24, 5400, 180.0)); //Neptune
+		getPlanet(8).setColour(0f, 0f, 1f);
 
 		updateFocus(0);
 		Planet.setFocus(focus);
@@ -41,8 +54,10 @@ public class SolarSystem implements DrawComponent, ClickComponent {
 
 	public void update(double t){
 
+		double scaledTime = (paused) ? 0 :  t * timeScale;
+
 		for (Planet p : bodies)
-			p.update(t * timeScale, bodies);
+			p.update(scaledTime, bodies);
 
 	}
 
@@ -61,21 +76,60 @@ public class SolarSystem implements DrawComponent, ClickComponent {
 
 	}
 
-	@Override
-	public void handleMousePress(MouseEvent e){}
+	private Planet getPlanet(int i){
 
-	@Override
-	public void handleMouseRelease(MouseEvent e){}
+		return bodies.get(i);
 
-	@Override
-	public void handleMouseDrag(MouseEvent e){}
+	}
 
-	@Override
-	public boolean handleMouseEvent(MouseEvent e, MouseEventType t){ return true; }
+	public void handleEvent(InputEvent x){
 
-	@Override
-	public void setReleasedEvent(Consumer<Object> c){}
+		if (x instanceof KeyEvent){
 
-	@Override
-	public void setPressedEvent(Consumer<Object> c){}
+			KeyEvent e = (KeyEvent)x;
+			KeyEventType t = (KeyEventType)InputListener.getType(x);
+			handleKeyEvent(e, t);
+
+		}
+
+		if (x instanceof MouseEvent){
+
+			MouseEvent e = (MouseEvent)x;
+			MouseEventType t = (MouseEventType)InputListener.getType(x);
+			
+			for (Planet p : bodies)
+				p.handleMouseEvent(e, t);
+
+		}
+
+	}
+
+	public boolean handleKeyEvent(KeyEvent k, KeyEventType t){
+
+		switch (t) {
+
+			case KEY_PRESSED:
+				handleKeyPress(k);
+				break;
+			case KEY_RELEASED:
+				handleKeyRelease(k);
+				break;
+
+		}
+
+		return true;
+
+	}
+	public void handleKeyPress(KeyEvent k){
+
+
+
+	}
+
+	public void handleKeyRelease(KeyEvent k){
+
+		if (k.getKeyCode() == KeyEvent.VK_SPACE)
+			paused = !paused;
+
+	}
 }
