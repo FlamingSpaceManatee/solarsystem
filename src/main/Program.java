@@ -187,7 +187,8 @@ public class Program{
 	private void handleEvent(InputEvent x){
 
 		m.handleEvent(x);
-
+		
+		/*
 		if (x instanceof KeyEvent){
 
 			KeyEvent e = (KeyEvent)x;
@@ -209,5 +210,6 @@ public class Program{
 			//c.handleMouseEvent(e, t);
 
 		}
+		*/
 	}
 }

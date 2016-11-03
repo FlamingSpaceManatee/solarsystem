@@ -21,10 +21,14 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 
 	public SolarSystem(){
 
-		//Good Solar System scale : 5e11 ( 2 * Distance from Sun to Mars)
-		Planet.setScale(5e8);
+		bodies = new ArrayList<Planet>();
+		
+		//Our Solar System
+		/*
+		//Good Solar System scale : 1e9
+		Planet.setScale(2e9);
 		timeScale = 864000;
-
+		
 		bodies = new ArrayList<Planet>();
 		bodies.add(new Planet(0, 0, 1.989e30, 0, 0.0)); //Sun
 		getPlanet(0).setColour(1f, 1f, 0f);
@@ -45,7 +49,16 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 		getPlanet(7).setColour(0f, 0.25f, 1f);
 		bodies.add(new Planet(0, -4495.1e9, 102e24, 5400, 180.0)); //Neptune
 		getPlanet(8).setColour(0f, 0f, 1f);
-
+		 */
+		
+		Planet.setScale(1e9);
+		timeScale = 864000;
+		
+		bodies.add(new Planet(0, 0, 1.989e30, 29800, 270.0)); //Sun
+		getPlanet(0).setColour(1f, 1f, 0f);
+		bodies.add(new Planet(149.6e9, 0, 2e30, 29800, 90.0)); //Sun 2
+		getPlanet(1).setColour(1f, 0.75f, 0f);
+		
 		updateFocus(0);
 		Planet.setFocus(focus);
 
@@ -59,11 +72,17 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 		for (Planet p : bodies)
 			p.update(scaledTime, bodies);
 
+		for (Planet p : bodies)
+			p.updatePos(t);
+		
 	}
 
 	@Override
 	public void draw(Graphics2D g){
-
+		
+		for (Planet p : bodies)
+			p.drawLine(g);
+		
 		for (Planet p : bodies)
 			p.draw(g);
 

@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class Planet extends UIElement implements DrawComponent {
@@ -16,22 +15,24 @@ public class Planet extends UIElement implements DrawComponent {
 	private static double 		SCALE;
 	private static int 			centreX = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
 	private static int 			centreY = Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-	protected double x, y, m;
+	protected double x, y, x1, y1, m;
 	private double vX, vY;
 	private String name;
 	private float[] colour;
 	private boolean infoShown = false;
+	private ArrayList<Point> path;
 
 	public Planet(double x, double y, double m, double v, double angle){
 
 		super((int)x, (int)y, 0, 0, true);
 
-		this.x = x;
-		this.y = y;
+		this.x = this.x1 = x;
+		this.y = this.y1 = y;
 		this.m = m;
 		this.vX =  v * Math.cos(Math.toRadians(angle));
 		this.vY = -v * Math.sin(Math.toRadians(angle));
 		this.colour = new float[]{1f, 1f, 1f};
+		this.path = new ArrayList<Point>();
 
 	}
 
@@ -88,7 +89,37 @@ public class Planet extends UIElement implements DrawComponent {
 
 		x += (t * vX);
 		y += (t * vY);
-
+		
+	}
+	
+	public void updatePos(double t){
+		
+		if (dragged)
+			return;
+		
+		//ADD POINT TO PATH
+		
+		int px = (int)(x / SCALE);
+		int py = (int)(y / SCALE);
+		
+		if (path.size() == 0){
+			
+			path.add(new Point(px, py));
+			return;
+			
+		}
+		
+		if (path.get(path.size() - 1).distance(px, py) > 2.50){
+			
+			path.add(new Point(px, py));
+			
+		}
+		
+		if (path.size() > 1000){
+			
+			path.remove(0);
+			
+		}
 	}
 
 	public void enableInfo(boolean show){
@@ -122,13 +153,24 @@ public class Planet extends UIElement implements DrawComponent {
 	@Override
 	public void draw(Graphics2D g){
 
-		double dX, dY;
-
-		dX = (x / SCALE) - (FOCUS.x / SCALE) + centreX;
-		dY = (y / SCALE) - (FOCUS.y / SCALE) + centreY;
+		int dx, dy; // dx, y draw points, px, y real points
+		
+		dx = (int)((x / SCALE) - (FOCUS.x / SCALE) + centreX);
+		dy = (int)((y / SCALE) - (FOCUS.y / SCALE) + centreY);
 
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
-		g.fillOval((int)(dX - 2), (int)(dY- 2), 4, 4);
+		g.fillOval((int)(dx - 2), (int)(dy- 2), 4, 4);
 
+	}
+	
+	public void drawLine(Graphics2D g){
+		
+		g.setColor(new Color(colour[0], colour[1], colour[2]));
+		
+		for (int i = 1; i < path.size(); i++){
+			
+			g.drawLine(path.get(i - 1).x + centreX, path.get(i - 1).y + centreY, path.get(i).x + centreX, path.get(i).y + centreY);
+			
+		}
 	}
 }
