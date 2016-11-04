@@ -27,6 +27,7 @@ public class SpriteSheet {
 
 		//System.out.println(image.getSize().width + " image width " + tileSize.width + " tile width");
 		//System.out.println(image.getSize().height + " image height " + tileSize.height + " tile height");
+		try {
 
 		int tilesWide = image.getSize().width / tileSize.width;
 		int tilesHigh = image.getSize().height / tileSize.height;
@@ -41,10 +42,18 @@ public class SpriteSheet {
 
 		return image.getImage().getSubimage(indexX * tileSize.width, indexY * tileSize.height, tileSize.width, tileSize.height);
 
+		} catch (Exception e) {
+
+			System.out.println("Couldn't get image " + index);
+			return getImage(0);
+
+		}
 	}
 
 	//Get scaled subimage at index based on tile width and height
 	public BufferedImage getImage(int index, float scale){
+
+		try {
 
 		if (scale == 1f)
 			return getImage(index);
@@ -62,6 +71,12 @@ public class SpriteSheet {
 												(int)(indexY * tileSize.height * scale), 
 												(int)(tileSize.width * scale), 
 												(int)(tileSize.height * scale));
+		} catch (Exception e) {
+
+			System.out.println("Couldn't get image " + index);
+			return getImage(0);
+
+		}
 
 	}
 }

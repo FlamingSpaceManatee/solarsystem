@@ -6,7 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Planet extends UIElement implements DrawComponent {
 	
@@ -15,12 +17,15 @@ public class Planet extends UIElement implements DrawComponent {
 	private static double 		SCALE;
 	private static int 			centreX = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
 	private static int 			centreY = Toolkit.getDefaultToolkit().getScreenSize().height / 2;
-	protected double x, y, x1, y1, m;
+	private static Random       rand = new Random();
+	private static SolarSystem	ss;
+	protected double x, y, x1, y1, m, r, s;
 	private double vX, vY;
-	private String name;
-	private float[] colour;
-	private boolean infoShown = false;
+	protected String name;
+	protected float[] colour;
 	private ArrayList<Point> path;
+	protected boolean boom = false;
+	protected Point centre;
 
 	public Planet(double x, double y, double m, double v, double angle){
 
@@ -33,6 +38,16 @@ public class Planet extends UIElement implements DrawComponent {
 		this.vY = -v * Math.sin(Math.toRadians(angle));
 		this.colour = new float[]{1f, 1f, 1f};
 		this.path = new ArrayList<Point>();
+		this.name = "Planet";
+		this.r = -1;
+		this.s = 1.0d;
+		this.centre = new Point((int)x, (int)y);
+
+	}
+
+	public static void setSolarSystem(SolarSystem s){
+
+		Planet.ss = s;
 
 	}
 
@@ -45,6 +60,55 @@ public class Planet extends UIElement implements DrawComponent {
 	public static void setScale(double scale){
 
 		SCALE = scale;
+
+	}
+
+	private double getRoche(Planet p){
+
+		if (r == -1)
+			return -1d;
+
+		return (1.26 * r * Math.pow(p.m / m, 1.0/3.0)) * 50;
+
+	}
+
+	public void setRadius(double r){
+
+		this.r = r;
+
+	}
+
+	public double getVelocity(){
+
+		return Math.sqrt(vX * vX + vY * vY);
+
+	}
+
+	public double getAngle(){
+
+		double a = Math.abs(Math.toDegrees(Math.atan(vY / vX)));
+
+		if 			(vY > 0 && vX < 0){
+
+			return 270.0 - a;
+
+		} else if 	(vY < 0 && vX < 0){
+
+			return 180.0 - a;
+
+		} else if 	(vY > 0 && vX > 0){
+
+			return 360.0 - a;
+
+		}
+
+		return a;
+	}
+
+	public void setVelocity(double v, double a){
+
+		this.vX =  v * Math.cos(Math.toRadians(a));
+		this.vY = -v * Math.sin(Math.toRadians(a));
 
 	}
 
@@ -69,6 +133,23 @@ public class Planet extends UIElement implements DrawComponent {
 				double rY = y - p.y;
 
 				double rr = ((rX * rX) + (rY * rY));
+				double d = Math.sqrt(rr);
+
+				if (d <= getRoche(p)){
+
+					System.out.println("roche");
+					for (int i = 0; i < 10; i++){
+
+						Planet n = new Planet(this.x + 1e8 * rand.nextDouble(), this.y + 1e8 * rand.nextDouble(), m * rand.nextFloat(), getVelocity() - rand.nextFloat() * 5e4, getAngle());
+						n.s = 0.75;
+						n.setPath((ArrayList<Point>)path.clone());
+						n.setColour(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+						ss.queuePlanet(n);
+
+					}
+					boom = true;
+				}
+
 				double a = (((G * m * p.m) / (rr)) / m);
 
 				double angle = Math.atan(rY / rX);
@@ -89,6 +170,8 @@ public class Planet extends UIElement implements DrawComponent {
 
 		x += (t * vX);
 		y += (t * vY);
+
+		centre.setLocation((int)x, (int)y);
 		
 	}
 	
@@ -109,13 +192,15 @@ public class Planet extends UIElement implements DrawComponent {
 			
 		}
 		
-		if (path.get(path.size() - 1).distance(px, py) > 2.50){
+		double d = path.get(path.size() - 1).distance(px, py);
+
+		if (d > 2.50){
 			
 			path.add(new Point(px, py));
 			
 		}
 		
-		if (path.size() > 1000){
+		while (path.size() > 1000){
 			
 			path.remove(0);
 			
@@ -126,6 +211,12 @@ public class Planet extends UIElement implements DrawComponent {
 
 		if (!show)
 			return;
+
+	}
+
+	protected void setPath(ArrayList<Point> path){
+
+		this.path = path;
 
 	}
 
@@ -148,6 +239,18 @@ public class Planet extends UIElement implements DrawComponent {
 		x += dx * SCALE;
 		y += dy * SCALE;
 
+		centre.setLocation((int)x, (int)y);
+
+	}
+
+	@Override
+	public void handleMouseRelease(MouseEvent e){
+
+		super.handleMouseRelease(e);
+
+		path = new ArrayList<Point>();
+		path.add(new Point(e.getPoint().x - centreX, e.getPoint().y - centreY));
+
 	}
 
 	@Override
@@ -159,7 +262,7 @@ public class Planet extends UIElement implements DrawComponent {
 		dy = (int)((y / SCALE) - (FOCUS.y / SCALE) + centreY);
 
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
-		g.fillOval((int)(dx - 2), (int)(dy- 2), 4, 4);
+		g.fillOval((int)(dx - 2 * s), (int)(dy- 2 * s), (int)(s * 4), (int)(s * 4));
 
 	}
 	
@@ -167,7 +270,7 @@ public class Planet extends UIElement implements DrawComponent {
 		
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
 		
-		for (int i = 1; i < path.size(); i++){
+		for (int i = 1; i < path.size(); i += 3){
 			
 			g.drawLine(path.get(i - 1).x + centreX, path.get(i - 1).y + centreY, path.get(i).x + centreX, path.get(i).y + centreY);
 			

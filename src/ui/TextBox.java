@@ -74,6 +74,18 @@ public class TextBox extends UIElement implements KeyComponent, DrawComponent {
 
 	}
 
+	public void setText(String t){
+
+		this.text = t;
+
+	}
+
+	public String getText(){
+
+		return text;
+
+	}
+
 	@Override
 	public boolean handleMouseEvent(MouseEvent e, MouseEventType t){
 
@@ -141,7 +153,7 @@ public class TextBox extends UIElement implements KeyComponent, DrawComponent {
 
 	private boolean reg(int n){
 
-		return ((n != KeyEvent.VK_SHIFT) || (n != KeyEvent.VK_CAPS_LOCK) || (n != KeyEvent.VK_ALT) || (n != KeyEvent.VK_TAB));
+		return ((n != KeyEvent.VK_SHIFT) && (n != KeyEvent.VK_CAPS_LOCK) && (n != KeyEvent.VK_ALT) && (n != KeyEvent.VK_TAB));
 
 	}
 }

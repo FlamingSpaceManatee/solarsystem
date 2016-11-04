@@ -2,6 +2,7 @@ package ui;
 
 import component.MouseEventType;
 import component.ClickComponent;
+import component.DrawComponent;
 
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -10,7 +11,7 @@ import java.awt.Point;
 import java.awt.Graphics2D;
 import java.util.function.Consumer;
 
-public abstract class UIElement implements ClickComponent {
+public abstract class UIElement implements ClickComponent, DrawComponent {
 	
 	protected Rectangle bounds;
 	protected Consumer<Object> onClick;
@@ -19,6 +20,7 @@ public abstract class UIElement implements ClickComponent {
 	protected boolean clicked;
 	protected boolean draggable;
 	protected boolean dragged;
+	protected boolean visible;
 
 	protected boolean delete;
 
@@ -34,6 +36,7 @@ public abstract class UIElement implements ClickComponent {
 		dragged = false;
 
 		delete = false;
+		visible = true;
 
 		clickElement = this;
 
@@ -49,8 +52,27 @@ public abstract class UIElement implements ClickComponent {
 		dragged = false;
 
 		delete = false;
+		visible = true;
 
 		clickElement = this;
+
+	}
+
+	public void setVisible(boolean visible){
+
+		this.visible = visible;
+
+	}
+
+	public boolean visible(){
+
+		return visible;
+
+	}
+
+	public Rectangle getBounds(){
+
+		return bounds;
 
 	}
 
