@@ -212,17 +212,19 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 
 		if (k.getKeyCode() == KeyEvent.VK_SPACE){
 
-			paused = ((infoBox.visible() && !infoBox.done) || (!infoBox.visible()));
-			infoBox.setVisible(paused);
+			if (!paused){
 
-			if (paused){
-
+				paused = true;
+				infoBox.setVisible(true);
 				lastFocus = focusI;
 				focusI = -1;
 
-			} else {
+			} else if (infoBox.done){
 
-				focusI = lastFocus;
+				paused = false;
+				infoBox.setVisible(false);
+				if (focusI == -1)
+					focusI = lastFocus;
 
 			}
 

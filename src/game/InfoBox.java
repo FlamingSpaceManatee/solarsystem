@@ -94,6 +94,7 @@ public class InfoBox extends Container {
 	public void setVisible(boolean v){
 
 		super.setVisible(v);
+		update();
 		if (v != visible()){
 
 			done = !v;
