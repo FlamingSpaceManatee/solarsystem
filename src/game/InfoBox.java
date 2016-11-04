@@ -50,11 +50,14 @@ public class InfoBox extends Container {
 		UIElement lastButton = new Button(115, 115, 25, 25, "arrow_left.png");
 		UIElement nextButton = new Button(145, 115, 25, 25, "arrow_right.png");
 
-		lastButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() - 1); update(); done = false; } );
-		nextButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() + 1); update(); done = false; } );
+		lastButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() - 1); done = false; } );
+		nextButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() + 1); done = false; } );
 
 		UIElement updateButton = new Button(0, 115, 100, 25, "update.png");
 		updateButton.setReleasedEvent(xxx -> {
+
+			if (focus == -1)
+				return;
 
 			try{planets.get(focus).m = Double.parseDouble(((TextBox)mass).getText());} catch (Exception e) {((TextBox)mass).setText("" + planets.get(focus).m);};
 			try{planets.get(focus).setVelocity(Double.parseDouble(((TextBox)velocity).getText()), Double.parseDouble(((TextBox)angle).getText()));} catch (Exception e) {};

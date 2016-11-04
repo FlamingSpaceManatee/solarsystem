@@ -18,8 +18,9 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 	private InfoBox infoBox;
 	private double timeScale;
 	private boolean paused;
-	private Point focus;
-	private int focusI;
+	protected Point focus;
+	protected int focusI;
+	protected int lastFocus;
 	private ArrayList<Planet> queued = new ArrayList<Planet>();
 
 	public SolarSystem(){
@@ -74,7 +75,6 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 		*/
 
 		updateFocus(0);
-		Planet.setFocus(focus);
 
 		infoBox = new InfoBox(this);
 
@@ -99,6 +99,7 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 
 		if (queued.size() > 0)
 			queued = new ArrayList<Planet>();
+
 	}
 
 	@Override
@@ -117,13 +118,11 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 	public void updateFocus(int focusI){
 
 		if (focusI >= bodies.size())
-			focusI = 0;
-		if (focusI < 0)
+			focusI = -1;
+		if (focusI < -1)
 			focusI = bodies.size() - 1;
 
 		this.focusI = focusI;
-		this.focus = bodies.get(focusI).centre;
-		Planet.setFocus(focus);
 
 	}
 
@@ -133,7 +132,7 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 
 	}
 
-	private Planet getPlanet(int i){
+	protected Planet getPlanet(int i){
 
 		return bodies.get(i);
 
@@ -215,6 +214,17 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 
 			paused = ((infoBox.visible() && !infoBox.done) || (!infoBox.visible()));
 			infoBox.setVisible(paused);
+
+			if (paused){
+
+				lastFocus = focusI;
+				focusI = -1;
+
+			} else {
+
+				focusI = lastFocus;
+
+			}
 
 		}
 

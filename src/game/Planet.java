@@ -194,7 +194,7 @@ public class Planet extends UIElement implements DrawComponent {
 		
 		double d = path.get(path.size() - 1).distance(px, py);
 
-		if (d > 2.50){
+		if (d > 5.00){
 			
 			path.add(new Point(px, py));
 			
@@ -223,8 +223,8 @@ public class Planet extends UIElement implements DrawComponent {
 	@Override
 	public boolean inside(Point p){
 
-		double x0 = (x / SCALE) - (FOCUS.x / SCALE) + centreX;
-		double y0 = (y / SCALE) - (FOCUS.y / SCALE) + centreY;
+		double x0 = (x / SCALE) + centreX;
+		double y0 = (y / SCALE) + centreY;
 
 		return (p.x > (x0 - 5) && 
 				p.x < (x0 + 5) &&
@@ -256,10 +256,21 @@ public class Planet extends UIElement implements DrawComponent {
 	@Override
 	public void draw(Graphics2D g){
 
-		int dx, dy; // dx, y draw points, px, y real points
-		
-		dx = (int)((x / SCALE) - (FOCUS.x / SCALE) + centreX);
-		dy = (int)((y / SCALE) - (FOCUS.y / SCALE) + centreY);
+		int dx, dy, fx, fy; // dx, y draw points, px, y real points
+
+		if (ss.focusI == -1){
+
+			fx = fy = 0;
+
+		} else {
+
+			fx = (int)ss.getPlanet(ss.focusI).x;
+			fy = (int)ss.getPlanet(ss.focusI).y;
+
+		}
+
+		dx = (int)(((x - fx) / SCALE) + centreX);
+		dy = (int)(((y - fy) / SCALE) + centreY);
 
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
 		g.fillOval((int)(dx - 2 * s), (int)(dy- 2 * s), (int)(s * 4), (int)(s * 4));
@@ -270,9 +281,25 @@ public class Planet extends UIElement implements DrawComponent {
 		
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
 		
-		for (int i = 1; i < path.size(); i += 3){
+		int fx, fy;
+
+		if (ss.focusI == -1){
+
+			fx = fy = 0;
+
+		} else {
+
+			fx = (int)ss.getPlanet(ss.focusI).x;
+			fy = (int)ss.getPlanet(ss.focusI).y;
+
+		}
+
+		for (int i = 1; i < path.size(); i += 2){
 			
-			g.drawLine(path.get(i - 1).x + centreX, path.get(i - 1).y + centreY, path.get(i).x + centreX, path.get(i).y + centreY);
+			g.drawLine(path.get(i - 1).x + centreX - (int)(fx / SCALE),
+				 path.get(i - 1).y + centreY - (int)(fy / SCALE), 
+				 path.get(i).x + centreX - (int)(fx / SCALE), 
+				 path.get(i).y + centreY - (int)(fy / SCALE));
 			
 		}
 	}
