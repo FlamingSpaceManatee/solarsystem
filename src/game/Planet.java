@@ -14,7 +14,7 @@ public class Planet extends UIElement implements DrawComponent {
 	
 	private static final double G = 6.67e-11;
 	private static Point 		FOCUS;
-	private static double 		SCALE;
+	protected static double 	SCALE;
 	private static int 			centreX = Toolkit.getDefaultToolkit().getScreenSize().width / 2;
 	private static int 			centreY = Toolkit.getDefaultToolkit().getScreenSize().height / 2;
 	private static Random       rand = new Random();
@@ -26,6 +26,7 @@ public class Planet extends UIElement implements DrawComponent {
 	private ArrayList<Point> path;
 	protected boolean boom = false;
 	protected Point centre;
+	protected boolean tail;
 
 	public Planet(double x, double y, double m, double v, double angle){
 
@@ -42,6 +43,7 @@ public class Planet extends UIElement implements DrawComponent {
 		this.r = -1;
 		this.s = 1.0d;
 		this.centre = new Point((int)x, (int)y);
+		this.tail = true;
 
 	}
 
@@ -90,7 +92,7 @@ public class Planet extends UIElement implements DrawComponent {
 
 		if 			(vY > 0 && vX < 0){
 
-			return 270.0 - a;
+			return 180.0 + a;
 
 		} else if 	(vY < 0 && vX < 0){
 
@@ -114,9 +116,9 @@ public class Planet extends UIElement implements DrawComponent {
 
 	public void setColour(float r ,float g, float b){
 
-		colour[0] = r;
-		colour[1] = g;
-		colour[2] = b;
+		colour[0] = Math.min(r, 1f);
+		colour[1] = Math.min(g, 1f);
+		colour[2] = Math.min(b, 1f);
 
 	}
 
@@ -144,7 +146,10 @@ public class Planet extends UIElement implements DrawComponent {
 						n.s = 0.75;
 						n.setPath((ArrayList<Point>)path.clone());
 						n.setColour(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+						n.tail = false;
+						n.name = name + " [Fragment #" + i + "]";
 						ss.queuePlanet(n);
+						ss.updateFocus(ss.focusI - 1);
 
 					}
 					boom = true;
@@ -170,8 +175,6 @@ public class Planet extends UIElement implements DrawComponent {
 
 		x += (t * vX);
 		y += (t * vY);
-
-		centre.setLocation((int)x, (int)y);
 		
 	}
 	
@@ -200,8 +203,9 @@ public class Planet extends UIElement implements DrawComponent {
 			
 		}
 		
-		while (path.size() > 1000){
+		while (path.size() > 500){
 			
+			path.remove(0);
 			path.remove(0);
 			
 		}
@@ -223,8 +227,11 @@ public class Planet extends UIElement implements DrawComponent {
 	@Override
 	public boolean inside(Point p){
 
-		double x0 = (x / SCALE) + centreX;
-		double y0 = (y / SCALE) + centreY;
+		int fx = (int)(ss.getPlanet(ss.focusI).x / SCALE);
+		int fy = (int)(ss.getPlanet(ss.focusI).y / SCALE);
+
+		double x0 = (x / SCALE) + centreX - fx;
+		double y0 = (y / SCALE) + centreY - fy;
 
 		return (p.x > (x0 - 5) && 
 				p.x < (x0 + 5) &&
@@ -248,8 +255,24 @@ public class Planet extends UIElement implements DrawComponent {
 
 		super.handleMouseRelease(e);
 
+		int fx = (int)(ss.getPlanet(ss.focusI).x / SCALE);
+		int fy = (int)(ss.getPlanet(ss.focusI).y / SCALE);
+
 		path = new ArrayList<Point>();
-		path.add(new Point(e.getPoint().x - centreX, e.getPoint().y - centreY));
+		path.add(new Point(e.getPoint().x - centreX + fx, e.getPoint().y - centreY + fy));
+
+	}
+
+	@Override
+	public void handleMouseDrag(MouseEvent e){
+
+		if (ss.getPlanet(ss.focusI) == this)
+			return;
+
+		dragged = true;
+
+		translate((e.getPoint().x) - clickedPoint.x, (e.getPoint().y) - clickedPoint.y);
+		clickedPoint = new Point(e.getPoint().x, e.getPoint().y);
 
 	}
 
@@ -258,48 +281,35 @@ public class Planet extends UIElement implements DrawComponent {
 
 		int dx, dy, fx, fy; // dx, y draw points, px, y real points
 
-		if (ss.focusI == -1){
+		fx = (int)(ss.getPlanet(ss.focusI).x / SCALE);
+		fy = (int)(ss.getPlanet(ss.focusI).y / SCALE);
 
-			fx = fy = 0;
-
-		} else {
-
-			fx = (int)ss.getPlanet(ss.focusI).x;
-			fy = (int)ss.getPlanet(ss.focusI).y;
-
-		}
-
-		dx = (int)(((x - fx) / SCALE) + centreX);
-		dy = (int)(((y - fy) / SCALE) + centreY);
+		dx = ((int)(x / SCALE)) + centreX - fx;
+		dy = ((int)(y / SCALE)) + centreY - fy;
 
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
-		g.fillOval((int)(dx - 2 * s), (int)(dy- 2 * s), (int)(s * 4), (int)(s * 4));
+		g.fillOval((int)(dx - 2 * s), (int)(dy - 2 * s), (int)(s * 4), (int)(s * 4));
 
 	}
 	
 	public void drawLine(Graphics2D g){
 		
+		if (!tail)
+			return;
+
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
 		
 		int fx, fy;
 
-		if (ss.focusI == -1){
-
-			fx = fy = 0;
-
-		} else {
-
-			fx = (int)ss.getPlanet(ss.focusI).x;
-			fy = (int)ss.getPlanet(ss.focusI).y;
-
-		}
+		fx = (int)(ss.getPlanet(ss.focusI).x / SCALE);
+		fy = (int)(ss.getPlanet(ss.focusI).y / SCALE);
 
 		for (int i = 1; i < path.size(); i += 2){
 			
-			g.drawLine(path.get(i - 1).x + centreX - (int)(fx / SCALE),
-				 path.get(i - 1).y + centreY - (int)(fy / SCALE), 
-				 path.get(i).x + centreX - (int)(fx / SCALE), 
-				 path.get(i).y + centreY - (int)(fy / SCALE));
+			g.drawLine(path.get(i - 1).x + centreX - fx,
+				 path.get(i - 1).y + centreY - fy, 
+				 path.get(i).x + centreX - fx, 
+				 path.get(i).y + centreY - fy);
 			
 		}
 	}
