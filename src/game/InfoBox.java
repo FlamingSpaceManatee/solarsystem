@@ -10,12 +10,14 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
 
+import java.util.function.Consumer;
+
 public class InfoBox extends Container {
 	
 	private SolarSystem s;
 	private ArrayList<Planet> planets;
 	private int focus;
-	protected boolean done = false;
+	protected Consumer<Object> updatePlanets;
 
 	private UIElement mass, name, velocity, angle, radius, red, green, blue, tScale, dScale;
 
@@ -39,15 +41,15 @@ public class InfoBox extends Container {
 
 		//VELOCITY INFO
 		UIElement velocityLabel = new Label(0, 34, "V: ");
-		velocity = new TextBox(48, 34, 500, 15, f);
+		velocity = new TextBox(32, 34, 500, 15, f);
 		((TextBox)velocity).setText("" + planets.get(focus).getVelocity());
 		UIElement angleLabel = new Label(0, 52, "@: ");
-		angle = new TextBox(48, 52, 500, 15, f);
+		angle = new TextBox(32, 52, 500, 15, f);
 		((TextBox)angle).setText("" + planets.get(focus).getAngle());
 
 		//RADIUS INFO
 		UIElement radiusInfo = new Label(0, 70, "R: ");
-		radius = new TextBox(48, 70, 500, 15, f);
+		radius = new TextBox(32, 70, 500, 15, f);
 		((TextBox)radius).setText("" + planets.get(focus).r);
 
 		//COLOUR
@@ -65,11 +67,11 @@ public class InfoBox extends Container {
 
 		//SCALES
 		UIElement tLabel = new Label(0, 106, "Time Scale: ");
-		tScale = new TextBox(176, 106, 500, 15, f);
+		tScale = new TextBox(192, 106, 500, 15, f);
 		((TextBox)tScale).setText("" + s.timeScale);
 
 		UIElement dLabel = new Label(0, 124, "Distance Scale: ");
-		dScale = new TextBox(240, 124, 500, 15, f);
+		dScale = new TextBox(256, 124, 500, 15, f);
 		((TextBox)dScale).setText("" + Planet.SCALE);
 
 		//TOGGLE TAIL
@@ -81,11 +83,10 @@ public class InfoBox extends Container {
 		UIElement lastButton = new Button(115, 142, 25, 25, "arrow_left.png");
 		UIElement nextButton = new Button(145, 142, 25, 25, "arrow_right.png");
 
-		lastButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() - 1); update(); done = false; } );
-		nextButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() + 1); update(); done = false; } );
+		lastButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() - 1); update(); } );
+		nextButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() + 1); update(); } );
 
-		UIElement updateButton = new Button(0, 142, 100, 25, "update.png");
-		updateButton.setReleasedEvent(xxx -> {
+		updatePlanets = xxx -> {
 
 			try{planets.get(focus).m = Double.parseDouble(((TextBox)mass).getText());} catch (Exception e) {((TextBox)mass).setText("" + planets.get(focus).m);};
 			try{planets.get(focus).setVelocity(Double.parseDouble(((TextBox)velocity).getText()), Double.parseDouble(((TextBox)angle).getText()));} catch (Exception e) {};
@@ -96,9 +97,11 @@ public class InfoBox extends Container {
 
 			planets.get(focus).name = ((TextBox)name).getText();
 			update();
-			done = true;
 
-			});
+		};
+
+		UIElement updateButton = new Button(0, 142, 100, 25, "update.png");
+		updateButton.setReleasedEvent(updatePlanets);
 
 		addElement(massLabel);
 		addElement(mass);
@@ -136,9 +139,21 @@ public class InfoBox extends Container {
 		((TextBox)name).setText(planets.get(focus).name);
 		((TextBox)velocity).setText("" + planets.get(focus).getVelocity());
 		((TextBox)angle).setText("" + planets.get(focus).getAngle());
-		((TextBox)red).setText("" + planets.get(focus).colour[0]);
-		((TextBox)green).setText("" + planets.get(focus).colour[1]);
-		((TextBox)blue).setText("" + planets.get(focus).colour[2]);
+
+		String r, g, b;
+
+		r = "" + planets.get(focus).colour[0];
+		r = r.substring(0, Math.min(r.length(), 5));
+
+		g = "" + planets.get(focus).colour[1];
+		g = g.substring(0, Math.min(g.length(), 5));
+
+		b = "" + planets.get(focus).colour[2];
+		b = b.substring(0, Math.min(b.length(), 5));
+
+		((TextBox)red).setText(r);
+		((TextBox)green).setText(g);
+		((TextBox)blue).setText(b);
 		((TextBox)radius).setText("" + planets.get(focus).r);
 
 	}
@@ -148,12 +163,6 @@ public class InfoBox extends Container {
 
 		super.setVisible(v);
 		update();
-		if (v != visible()){
-
-			done = !v;
-			update();
-
-		}
 
 	}
 
@@ -185,5 +194,20 @@ public class InfoBox extends Container {
 
 		super.draw(g);
 
+	}
+
+	public boolean elementFocused(){
+
+		return (((TextBox)mass).focused() || 
+			((TextBox)name).focused() || 
+			((TextBox)velocity).focused() || 
+			((TextBox)angle).focused() || 
+			((TextBox)radius).focused() || 
+			((TextBox)red).focused() || 
+			((TextBox)green).focused() || 
+			((TextBox)blue).focused() || 
+			((TextBox)tScale).focused() || 
+			((TextBox)dScale).focused());
+	
 	}
 }

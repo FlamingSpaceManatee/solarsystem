@@ -226,9 +226,10 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 				paused = true;
 				infoBox.setVisible(true);
 
-			} else if (infoBox.done){
+			} else if (!infoBox.elementFocused()){
 
 				paused = false;
+				infoBox.updatePlanets.accept(this);
 				infoBox.setVisible(false);
 
 			}

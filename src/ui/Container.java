@@ -118,8 +118,8 @@ public class Container extends UIElement implements KeyComponent {
 
 		if (image == null){
 		
-			g.setColor(java.awt.Color.RED);
-			g.draw(bounds);
+			//g.setColor(java.awt.Color.RED);
+			//g.draw(bounds);
 
 		} else {
 

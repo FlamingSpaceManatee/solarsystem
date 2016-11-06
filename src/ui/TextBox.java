@@ -144,7 +144,7 @@ public class TextBox extends UIElement implements KeyComponent, DrawComponent {
 		if (image != null)
 			g.drawImage(image.getImage(), bounds.x, bounds.y, null);
 		else
-			g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
+			//g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
 		for (int i = 0; i < text.length(); i++)
 			g.drawImage(font.getChar(text.charAt(i), SCALE), bounds.x + i * font.getWidth() + i, bounds.y, null);
@@ -154,6 +154,18 @@ public class TextBox extends UIElement implements KeyComponent, DrawComponent {
 	private boolean reg(int n){
 
 		return ((n != KeyEvent.VK_SHIFT) && (n != KeyEvent.VK_CAPS_LOCK) && (n != KeyEvent.VK_ALT) && (n != KeyEvent.VK_TAB));
+
+	}
+
+	public boolean focused(){
+
+		return focused;
+
+	}
+
+	public void setFocused(boolean t){
+
+		focused = t;
 
 	}
 }
