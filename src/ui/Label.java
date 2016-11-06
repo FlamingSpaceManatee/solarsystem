@@ -18,6 +18,15 @@ public class Label extends UIElement {
 
 	}
 
+	public Label(int x, int y, String text, Font f){
+
+		super(x, y, 1920, 1080);
+
+		this.text = text;
+		font = f;
+
+	}
+
 	public void setText(String text){
 
 		this.text = text;

@@ -29,59 +29,60 @@ public class InfoBox extends Container {
 		this.planets = s.getPlanets();
 
 		Font f = new Font("ascii.png", 16, 15);
+		Font y = new Font("ascii-yellow.png", 16, 15);
 
 		//MASS INFO
 		UIElement massLabel = new Label(0, 17, "Mass: ");
-		mass = new TextBox(80, 17, 200, 15, f);
+		mass = new TextBox(80, 17, 200, 15, y);
 		((TextBox)mass).setText("" + planets.get(focus).m);
 
 		//NAME INFO
-		name = new TextBox(0, 0, 400, 15, f);
+		name = new TextBox(0, 0, 400, 15, y);
 		((TextBox)name).setText(planets.get(focus).name);
 
 		//VELOCITY INFO
 		UIElement velocityLabel = new Label(0, 34, "V: ");
-		velocity = new TextBox(32, 34, 500, 15, f);
+		velocity = new TextBox(32, 34, 500, 15, y);
 		((TextBox)velocity).setText("" + planets.get(focus).getVelocity());
 		UIElement angleLabel = new Label(0, 52, "@: ");
-		angle = new TextBox(32, 52, 500, 15, f);
+		angle = new TextBox(32, 52, 500, 15, y);
 		((TextBox)angle).setText("" + planets.get(focus).getAngle());
 
 		//RADIUS INFO
 		UIElement radiusInfo = new Label(0, 70, "R: ");
-		radius = new TextBox(32, 70, 500, 15, f);
+		radius = new TextBox(32, 70, 500, 15, y);
 		((TextBox)radius).setText("" + planets.get(focus).r);
 
 		//COLOUR
 		UIElement rLabel = new Label(0, 88, "Red: ");
-		red = new TextBox(74, 88, 82, 15, f);
+		red = new TextBox(74, 88, 82, 15, y);
 		((TextBox)red).setText("" + planets.get(focus).colour[0]);
 
 		UIElement gLabel = new Label(162, 88, "Green: ");
-		green = new TextBox(260, 88, 82, 15, f);
+		green = new TextBox(260, 88, 82, 15, y);
 		((TextBox)green).setText("" + planets.get(focus).colour[1]);
 
 		UIElement bLabel = new Label(340, 88, "Blue: ");
-		blue = new TextBox(420, 88, 82, 15, f);
+		blue = new TextBox(420, 88, 82, 15, y);
 		((TextBox)blue).setText("" + planets.get(focus).colour[2]);
 
 		//SCALES
 		UIElement tLabel = new Label(0, 106, "Time Scale: ");
-		tScale = new TextBox(192, 106, 500, 15, f);
+		tScale = new TextBox(192, 106, 500, 15, y);
 		((TextBox)tScale).setText("" + s.timeScale);
 
 		UIElement dLabel = new Label(0, 124, "Distance Scale: ");
-		dScale = new TextBox(256, 124, 500, 15, f);
+		dScale = new TextBox(256, 124, 500, 15, y);
 		((TextBox)dScale).setText("" + Planet.SCALE);
 
 		//TOGGLE TAIL
-		UIElement tailButton = new Button(185, 142, 50, 25, "tail.png");
+		UIElement tailButton = new Button(185 + 25, 142, 50, 25, "tail.png");
 
 		tailButton.setReleasedEvent(xxx -> {planets.get(focus).tail = !planets.get(focus).tail;});
 
 		//SWITCH PLANETS
-		UIElement lastButton = new Button(115, 142, 25, 25, "arrow_left.png");
-		UIElement nextButton = new Button(145, 142, 25, 25, "arrow_right.png");
+		UIElement lastButton = new Button(115 + 25, 142, 25, 25, "arrow_left.png");
+		UIElement nextButton = new Button(145 + 25, 142, 25, 25, "arrow_right.png");
 
 		lastButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() - 1); update(); } );
 		nextButton.setReleasedEvent(xxx -> {s.updateFocus(s.getFocus() + 1); update(); } );
@@ -100,7 +101,7 @@ public class InfoBox extends Container {
 
 		};
 
-		UIElement updateButton = new Button(0, 142, 100, 25, "update.png");
+		UIElement updateButton = new Button(25, 142, 100, 25, "update.png");
 		updateButton.setReleasedEvent(updatePlanets);
 
 		addElement(massLabel);
