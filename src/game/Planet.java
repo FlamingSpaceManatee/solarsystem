@@ -149,7 +149,7 @@ public class Planet extends UIElement implements DrawComponent {
 						n.tail = false;
 						n.name = name + " [Fragment #" + i + "]";
 						ss.queuePlanet(n);
-						ss.updateFocus(ss.focusI - 1);
+						ss.updateFocus(0);
 
 					}
 					boom = true;
