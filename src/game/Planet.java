@@ -20,7 +20,7 @@ public class Planet extends UIElement implements DrawComponent {
 	private static Random       rand = new Random();
 	private static SolarSystem	ss;
 	protected double x, y, x1, y1, m, r, s;
-	private double vX, vY;
+	private double vX, vY, aX, aY;
 	protected String name;
 	protected float[] colour;
 	private ArrayList<Point> path;
@@ -127,6 +127,9 @@ public class Planet extends UIElement implements DrawComponent {
 		if (bodies == null || t == 0 || dragged)
 			return;
 
+		this.aX = 0;
+		this.aY = 0;
+
 		for (Planet p : bodies){
 
 			if (this != p){
@@ -166,15 +169,17 @@ public class Planet extends UIElement implements DrawComponent {
 				if (rY >= 0)
 					aY = -aY;
 
-				vX += (aX * t);
-				vY += (aY * t);
+				this.aX += aX;
+				this.aY += aY;
 
 
 			}
 		}
 
-		x += (t * vX);
-		y += (t * vY);
+		x += (vX * t) + (0.5 * aX * (t * t));
+		vX += (aX * t);
+		y += (vY * t) + (0.5 * aY * (t * t));
+		vY += (aY * t);
 		
 	}
 	
