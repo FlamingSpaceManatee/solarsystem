@@ -34,8 +34,8 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 		//Good Solar System scale : 1e9
 
 		
-		Planet.setScale(1e9);
-		timeScale = 864000;
+		Planet.setScale(5e8);
+		timeScale = 432000;
 		
 		bodies.add(new Planet(0, 0, 1.989e30, 0, 0.0)); //Sun
 		getPlanet(0).setColour(1f, 1f, 0f);
@@ -49,7 +49,7 @@ public class SolarSystem implements DrawComponent, KeyComponent {
 		getPlanet(2).setColour(0f, 1f, 0.5f);
 		getPlanet(2).setRadius(6051800);
 		getPlanet(2).name = "Venus";
-		bodies.add(new Planet(149e9, 0, 5.972e24, 15000, 90.0)); //Earth
+		bodies.add(new Planet(149e9, 0, 5.972e24, 29800, 90.0)); //Earth
 		getPlanet(3).setColour(0f, 0f, 1f);
 		getPlanet(3).setRadius(6371000);
 		getPlanet(3).name = "Earth";
