@@ -114,7 +114,9 @@ public class Program{
 
 			while(InputListener.hasEvents()){
 
-				handleEvent(InputListener.nextEvent());
+				InputEvent e = InputListener.nextEvent();
+				handleEvent(e);
+				InputListener.removeEvent(e);
 
 			}
 
@@ -188,7 +190,7 @@ public class Program{
 
 		m.handleEvent(x);
 		
-		/*
+		
 		if (x instanceof KeyEvent){
 
 			KeyEvent e = (KeyEvent)x;
@@ -198,18 +200,14 @@ public class Program{
 				t == KeyEventType.KEY_RELEASED)
 				System.exit(0);
 
-			//HANDLE KEY EVENTS
-			//c.handleKeyEvent(e, t);
-
 		}
 
 		if (x instanceof MouseEvent){
 
 			MouseEvent e = (MouseEvent)x;
 			MouseEventType t = (MouseEventType)InputListener.getType(x);
-			//c.handleMouseEvent(e, t);
 
 		}
-		*/
+		
 	}
 }

@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
+import java.awt.BasicStroke;
 
 public class Planet extends UIElement implements DrawComponent {
 	
@@ -23,7 +24,7 @@ public class Planet extends UIElement implements DrawComponent {
 	private double vX, vY;
 	protected String name;
 	protected float[] colour;
-	private ArrayList<Point> path;
+	private ArrayList<DoublePoint> path;
 	protected boolean boom = false;
 	protected Point centre;
 	protected boolean tail;
@@ -38,7 +39,7 @@ public class Planet extends UIElement implements DrawComponent {
 		this.vX =  v * Math.cos(Math.toRadians(angle));
 		this.vY = -v * Math.sin(Math.toRadians(angle));
 		this.colour = new float[]{1f, 1f, 1f};
-		this.path = new ArrayList<Point>();
+		this.path = new ArrayList<DoublePoint>();
 		this.name = "Planet";
 		this.r = -1;
 		this.s = 1.0d;
@@ -144,12 +145,12 @@ public class Planet extends UIElement implements DrawComponent {
 
 						Planet n = new Planet(this.x + 1e8 * rand.nextDouble(), this.y + 1e8 * rand.nextDouble(), m * rand.nextFloat(), getVelocity() - rand.nextFloat() * 5e4, getAngle());
 						n.s = 0.75;
-						n.setPath((ArrayList<Point>)path.clone());
+						n.setPath((ArrayList<DoublePoint>)path.clone());
 						n.setColour(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
 						n.tail = false;
 						n.name = name + " [Fragment #" + i + "]";
 						ss.queuePlanet(n);
-						ss.updateFocus(0);
+						ss.updateFocus(ss.focusI - 1);
 
 					}
 					boom = true;
@@ -183,23 +184,18 @@ public class Planet extends UIElement implements DrawComponent {
 		if (dragged)
 			return;
 		
-		//ADD POINT TO PATH
-		
-		int px = (int)(x / SCALE);
-		int py = (int)(y / SCALE);
-		
 		if (path.size() == 0){
 			
-			path.add(new Point(px, py));
+			path.add(new DoublePoint(x, y));
 			return;
 			
 		}
 		
-		double d = path.get(path.size() - 1).distance(px, py);
+		double d = path.get(path.size() - 1).distance(x, y) / 1e9;
 
 		if (d > 5.00){
 			
-			path.add(new Point(px, py));
+			path.add(new DoublePoint(x, y));
 			
 		}
 		
@@ -218,7 +214,7 @@ public class Planet extends UIElement implements DrawComponent {
 
 	}
 
-	protected void setPath(ArrayList<Point> path){
+	protected void setPath(ArrayList<DoublePoint> path){
 
 		this.path = path;
 
@@ -255,12 +251,15 @@ public class Planet extends UIElement implements DrawComponent {
 
 		super.handleMouseRelease(e);
 
-		int fx = (int)(ss.getPlanet(ss.focusI).x / SCALE);
-		int fy = (int)(ss.getPlanet(ss.focusI).y / SCALE);
+		double fx = ss.getPlanet(ss.focusI).x;
+		double fy = ss.getPlanet(ss.focusI).y;
 
-		path = new ArrayList<Point>();
-		path.add(new Point(e.getPoint().x - centreX + fx, e.getPoint().y - centreY + fy));
+		if (dragged){
+			
+			path = new ArrayList<DoublePoint>();
+			path.add(new DoublePoint((e.getPoint().x * SCALE) + fx - (centreX * SCALE), (e.getPoint().y * SCALE) + fy - (centreY / SCALE)));
 
+		}
 	}
 
 	@Override
@@ -287,8 +286,11 @@ public class Planet extends UIElement implements DrawComponent {
 		dx = ((int)(x / SCALE)) + centreX - fx;
 		dy = ((int)(y / SCALE)) + centreY - fy;
 
+		int r = (int)Math.max((1e9 / SCALE) * 4, 4);
+		int dr = r / 2;
+
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
-		g.fillOval((int)(dx - 2 * s), (int)(dy - 2 * s), (int)(s * 4), (int)(s * 4));
+		g.fillOval((int)(dx - dr * s), (int)(dy - dr * s), (int)(s * r), (int)(s * r));
 
 	}
 	
@@ -297,20 +299,25 @@ public class Planet extends UIElement implements DrawComponent {
 		if (!tail)
 			return;
 
+		g.setStroke(new BasicStroke((int)Math.min(1e9 / SCALE, 1), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g.setColor(new Color(colour[0], colour[1], colour[2]));
 		
-		int fx, fy;
+		int fx, fy, dx0, dx1, dy0, dy1;
 
 		fx = (int)(ss.getPlanet(ss.focusI).x / SCALE);
 		fy = (int)(ss.getPlanet(ss.focusI).y / SCALE);
 
 		for (int i = 1; i < path.size(); i += 2){
 			
-			g.drawLine(path.get(i - 1).x + centreX - fx,
-				 path.get(i - 1).y + centreY - fy, 
-				 path.get(i).x + centreX - fx, 
-				 path.get(i).y + centreY - fy);
+			dx0 = (int)((path.get(i - 1).x / SCALE) + centreX - fx);
+			dy0 = (int)((path.get(i - 1).y / SCALE) + centreY - fy);
+			dx1 = (int)((path.get(i).x / SCALE) + centreX - fx);
+			dy1 = (int)((path.get(i).y / SCALE) + centreY - fy);
+
+			g.drawLine(dx0, dy0, dx1, dy1);
 			
 		}
+
+		g.setStroke(new BasicStroke(1));
 	}
 }

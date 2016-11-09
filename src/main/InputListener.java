@@ -45,10 +45,13 @@ public class InputListener extends MouseInputAdapter implements KeyListener{
 		if (!hasEvents())
 			return null;
 
-		Object o = events.get(e);
+		return events.get(e);
+
+	}
+
+	public static void removeEvent(Object e){
+
 		events.remove(e);
-		
-		return o;
 
 	}
 
